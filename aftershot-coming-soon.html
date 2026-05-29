@@ -653,10 +653,16 @@
     }
     #pre-tag{
       margin-top:0.85rem;
-      font-size:0.48rem;letter-spacing:0.5em;
-      text-transform:uppercase;color:rgba(244,239,232,0.18);
-      font-family:'Inter',sans-serif;font-weight:300;
+      font-size:clamp(0.52rem,0.85vw,0.62rem);
+      letter-spacing:0.38em;
+      text-transform:uppercase;
+      color:rgba(244,239,232,0.65);
+      font-family:'Share Tech Mono','Courier New',monospace;
+      font-weight:400;
+      text-shadow:0 0 12px rgba(232,97,58,0.25);
     }
+    #pre-tag .pre-dot{color:rgba(232,97,58,0.85);}
+    #pre-tag .pre-accent{color:var(--accent);}
 
     /* ══════════════════════════════════════════════════════════════════════
        COUNTDOWN
@@ -721,7 +727,7 @@
       </div>
     </div>
     <div id="pre-bar-wrap"><div id="pre-bar"></div></div>
-    <div id="pre-tag">Lights &nbsp;·&nbsp; Camera &nbsp;·&nbsp; Action</div>
+    <div id="pre-tag">Lights <span class="pre-dot">·</span> <span class="pre-accent">Camera</span> <span class="pre-dot">·</span> Action</div>
   </div>
 </div>
 
