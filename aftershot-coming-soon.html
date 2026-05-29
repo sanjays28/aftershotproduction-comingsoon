@@ -179,6 +179,23 @@
     }
     .email-input::placeholder{color:rgba(244,239,232,0.18);}
     .email-input:focus{border-color:rgba(232,97,58,0.5);}
+    #form-err{
+      display:none;margin-top:0.55rem;
+      font-size:0.48rem;letter-spacing:0.12em;
+      color:rgba(224,48,48,0.75);
+      font-family:'Inter',sans-serif;font-weight:300;
+    }
+    #waitlist-return{display:none;margin-bottom:0.35rem;}
+    #waitlist-return-msg{
+      font-size:0.58rem;letter-spacing:0.18em;
+      color:rgba(232,97,58,0.75);margin-bottom:0.45rem;
+    }
+    #waitlist-return-email{
+      font-size:0.72rem;letter-spacing:0.08em;
+      color:rgba(244,239,232,0.55);
+      font-family:'Inter',sans-serif;font-weight:300;
+      word-break:break-all;
+    }
     #btn{
       position:relative;overflow:hidden;
       background:transparent;border:1px solid rgba(232,97,58,0.45);
@@ -909,19 +926,27 @@
 
       <div id="cta" style="opacity:0;transform:translateY(18px);">
         <!-- Label sits above the form so it never competes for width -->
-        <p style="font-size:0.48rem;letter-spacing:0.42em;text-transform:uppercase;
+        <p id="cta-label" style="font-size:0.48rem;letter-spacing:0.42em;text-transform:uppercase;
                   color:rgba(244,239,232,0.45);margin-bottom:0.7rem;">
           Be first to know —
         </p>
+        <div id="waitlist-return" aria-live="polite">
+          <p id="waitlist-return-msg">You're already on the list ✦</p>
+          <p id="waitlist-return-email"></p>
+        </div>
         <form id="frm" onsubmit="submitForm(event)" novalidate
-              style="display:flex;align-items:center;gap:0.75rem;">
-          <input type="email" id="eml" class="email-input"
+              style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <!-- Honeypot — leave empty; blocks bots -->
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true"
+                 style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" />
+          <input type="email" id="eml" name="email" class="email-input"
                  placeholder="your@email.com" required autocomplete="email"
                  style="flex:1;min-width:0;" />
           <button type="submit" id="btn" style="flex-shrink:0;">Notify Me</button>
           <span id="ok" style="display:none;font-size:0.58rem;letter-spacing:0.18em;
                                color:rgba(232,97,58,0.7);">You're on the list ✦</span>
         </form>
+        <p id="form-err" role="alert"></p>
         <!-- FOMO counter -->
         <p id="fomo"><span id="fomo-n">347</span>+ already on the list</p>
       </div>
@@ -1047,7 +1072,87 @@
    AFTERSHOT PRODUCTIONS — COMING SOON
    ══════════════════════════════════════════════════════════════════════ */
 
-// (Film strips removed — Spline 3D scene is the right-panel background)
+// ── Waitlist (Formspree — static-site friendly) ───────────────────────────
+// 1. Sign up free at https://formspree.io
+// 2. Create a form → copy your form ID (the xxxxxxxx part)
+// 3. Paste it below: https://formspree.io/f/xxxxxxxx
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xgoqdqky';
+
+// ── Waitlist local state (per browser — social proof + return visits) ─────
+const WAITLIST_BASE     = 347;
+const LS_WAITLIST_EMAIL = 'aftershot_waitlist_email';
+const LS_WAITLIST_COUNT = 'aftershot_waitlist_count';
+
+function getWaitlistEmail() {
+  try { return localStorage.getItem(LS_WAITLIST_EMAIL) || ''; }
+  catch { return ''; }
+}
+
+function getWaitlistCount() {
+  try {
+    const n = parseInt(localStorage.getItem(LS_WAITLIST_COUNT), 10);
+    return Number.isFinite(n) ? n : WAITLIST_BASE;
+  } catch { return WAITLIST_BASE; }
+}
+
+function saveWaitlistSignup(email) {
+  const next = getWaitlistEmail() ? getWaitlistCount() : getWaitlistCount() + 1;
+  try {
+    localStorage.setItem(LS_WAITLIST_EMAIL, email);
+    localStorage.setItem(LS_WAITLIST_COUNT, String(next));
+  } catch { /* private browsing — still show success */ }
+  return next;
+}
+
+function animateFomoCount(target, duration = 2400, delay = 0) {
+  setTimeout(() => {
+    const el = document.getElementById('fomo-n');
+    if (!el) return;
+    let t0 = null;
+    (function tick(ts) {
+      if (!t0) t0 = ts;
+      const p = Math.min((ts - t0) / duration, 1);
+      el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    })(performance.now());
+  }, delay);
+}
+
+function bumpFomoCount(target) {
+  const el = document.getElementById('fomo-n');
+  if (!el) return;
+  const from = parseInt(el.textContent, 10) || WAITLIST_BASE;
+  if (target <= from) { el.textContent = target; return; }
+  const dur = 900;
+  let t0 = null;
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / dur, 1);
+    el.textContent = Math.round(from + (target - from) * (1 - Math.pow(1 - p, 3)));
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  })(performance.now());
+}
+
+function showWaitlistReturnState(email) {
+  const label  = document.getElementById('cta-label');
+  const ret    = document.getElementById('waitlist-return');
+  const retEml = document.getElementById('waitlist-return-email');
+  const frm    = document.getElementById('frm');
+  const ok     = document.getElementById('ok');
+  if (label) label.style.display = 'none';
+  if (frm)   frm.style.display   = 'none';
+  if (ok)    ok.style.display    = 'none';
+  if (ret)   ret.style.display   = 'block';
+  if (retEml) retEml.textContent = email;
+}
+
+function initWaitlistUI() {
+  const email = getWaitlistEmail();
+  if (email) showWaitlistReturnState(email);
+  return getWaitlistCount();
+}
 
 // ── Ticker ──────────────────────────────────────────────────────────────
 function buildTicker() {
@@ -1263,20 +1368,9 @@ function startMainTimeline() {
   // Film strip reveal
   document.getElementById('filmstrip-l').classList.add('fs-on');
 
-  // FOMO count-up: 0 → 347 over 2.4s with ease-out
-  setTimeout(() => {
-    const el = document.getElementById('fomo-n');
-    if (!el) return;
-    const target = 347, dur = 2400;
-    let t0 = null;
-    (function tick(ts) {
-      if (!t0) t0 = ts;
-      const p = Math.min((ts - t0) / dur, 1);
-      el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
-      if (p < 1) requestAnimationFrame(tick);
-      else el.textContent = target;
-    })(performance.now());
-  }, 2000);
+  // FOMO count-up — 347 for new visitors, saved count for return visits
+  const fomoTarget = initWaitlistUI();
+  setTimeout(() => animateFomoCount(fomoTarget, 2400, 0), 2000);
 }
 
 // ── Preloader ─────────────────────────────────────────────────────────────
@@ -1606,17 +1700,73 @@ if(btn){
 
 
 // ── Form ──────────────────────────────────────────────────────────────────
-function submitForm(e){
+async function submitForm(e) {
   e.preventDefault();
-  const email=document.getElementById('eml').value.trim();
-  if(!email)return;
-  const b=document.getElementById('btn'),ok=document.getElementById('ok');
-  b.textContent='···';b.disabled=true;b.style.opacity='0.6';
-  setTimeout(()=>{
-    gsap.to('#frm',{opacity:0.15,duration:0.5});
-    ok.style.display='inline-block';
-    gsap.from(ok,{y:8,opacity:0,duration:0.6,ease:'power2.out'});
-  },900);
+
+  const input = document.getElementById('eml');
+  const email = input.value.trim();
+  if (!email) return;
+
+  const saved = getWaitlistEmail();
+  if (saved) {
+    showWaitlistReturnState(saved);
+    return;
+  }
+
+  const btn = document.getElementById('btn');
+  const ok  = document.getElementById('ok');
+  const err = document.getElementById('form-err');
+  const frm = document.getElementById('frm');
+
+  err.style.display = 'none';
+  err.textContent = '';
+  btn.textContent = '···';
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+
+  if (FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')) {
+    btn.textContent = 'Notify Me';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    err.textContent = 'Waitlist not configured yet — add your Formspree form ID in the page script.';
+    err.style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        _subject: 'Aftershot Productions — waitlist signup',
+        _gotcha: document.querySelector('#frm [name="_gotcha"]')?.value || '',
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Something went wrong. Please try again.');
+    }
+
+    const newCount = saveWaitlistSignup(email);
+    bumpFomoCount(newCount);
+
+    gsap.to(frm, { opacity: 0.15, duration: 0.5 });
+    ok.style.display = 'inline-block';
+    gsap.from(ok, { y: 8, opacity: 0, duration: 0.6, ease: 'power2.out' });
+
+    setTimeout(() => showWaitlistReturnState(email), 2200);
+  } catch (error) {
+    btn.textContent = 'Notify Me';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    err.textContent = error.message || 'Could not join the list. Please try again.';
+    err.style.display = 'block';
+  }
 }
 </script>
 
