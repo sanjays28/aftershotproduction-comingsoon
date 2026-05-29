@@ -1306,8 +1306,16 @@ function scheduleGlitch() {
   setTimeout(() => { triggerGlitch(); scheduleGlitch(); }, delay);
 }
 
-// ── Launch date (change this to your actual date) ─────────────────────────
-const LAUNCH_DATE = new Date('2026-09-01T00:00:00');
+// ── Launch countdown — synced to visitor's system clock ───────────────────
+// Set PUBLISH_DATE to the day you ship; countdown ends LAUNCH_DAYS later at midnight.
+const LAUNCH_DAYS = 30;
+const PUBLISH_DATE = '2026-05-29';
+const LAUNCH_DATE = (() => {
+  const [y, m, d] = PUBLISH_DATE.split('-').map(Number);
+  const launch = new Date(y, m - 1, d, 0, 0, 0, 0);
+  launch.setDate(launch.getDate() + LAUNCH_DAYS);
+  return launch;
+})();
 
 // ── Countdown ────────────────────────────────────────────────────────────
 function setDigit(id, val) {
