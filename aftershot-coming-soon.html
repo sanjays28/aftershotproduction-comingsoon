@@ -94,10 +94,15 @@
     .vf-bl{bottom:20px;left:20px;}.vf-br{bottom:20px;right:20px;}
     .vfc-h{position:absolute;top:0;left:0;width:100%;height:1px;background:rgba(232,97,58,0.45);transform:scaleX(0);transform-origin:left;}
     .vfc-v{position:absolute;top:0;left:0;width:1px;height:100%;background:rgba(232,97,58,0.45);transform:scaleY(0);transform-origin:top;}
-    .vf-tr .vfc-h,.vf-br .vfc-h{transform-origin:right;}
+    /* Top-right: h grows from right, v on right side */
+    .vf-tr .vfc-h{transform-origin:right;}
     .vf-tr .vfc-v{left:auto;right:0;}
-    .vf-bl .vfc-v{transform-origin:bottom;}
-    .vf-br .vfc-v{left:auto;right:0;transform-origin:bottom;}
+    /* Bottom-left: h sits at bottom, v grows upward from bottom-left */
+    .vf-bl .vfc-h{top:auto;bottom:0;}
+    .vf-bl .vfc-v{top:auto;bottom:0;transform-origin:bottom;}
+    /* Bottom-right: h sits at bottom grows from right, v at bottom-right grows upward */
+    .vf-br .vfc-h{top:auto;bottom:0;transform-origin:right;}
+    .vf-br .vfc-v{top:auto;bottom:0;left:auto;right:0;transform-origin:bottom;}
     @media(max-width:767px){.vf{display:none;}}
 
     /* ── Typography ───────────────────────────────────────────────────────── */
@@ -120,8 +125,8 @@
       background:transparent;border:none;
       border-bottom:1px solid rgba(244,239,232,0.18);
       color:var(--paper);font-family:'Inter',sans-serif;
-      font-size:0.78rem;font-weight:200;letter-spacing:0.1em;
-      padding:0.55rem 0.15rem;outline:none;width:100%;
+      font-size:0.75rem;font-weight:200;letter-spacing:0.1em;
+      padding:0.5rem 0.15rem;outline:none;width:100%;
       transition:border-color 0.4s ease;
     }
     .email-input::placeholder{color:rgba(244,239,232,0.18);}
@@ -143,15 +148,60 @@
     #btn:hover{border-color:var(--accent);}
 
     /* ── Ticker ───────────────────────────────────────────────────────────── */
+    /* ── Ticker band ─────────────────────────────────────────────────────── */
     #ticker-wrap{
-      overflow:hidden;flex-shrink:0;
-      border-top:1px solid rgba(244,239,232,0.06);
-      padding:0.6rem 0;opacity:0;
+      flex-shrink:0; overflow:hidden; opacity:0; position:relative;
+      border-top:1px solid rgba(232,97,58,0.3);
+      border-bottom:1px solid rgba(232,97,58,0.1);
+      background:rgba(232,97,58,0.022);
     }
-    #ticker-track{display:inline-flex;white-space:nowrap;gap:0;animation:tickerRoll 40s linear infinite;}
-    #ticker-track span{font-size:0.5rem;letter-spacing:0.38em;text-transform:uppercase;color:rgba(244,239,232,0.18);padding:0 2rem;flex-shrink:0;}
-    #ticker-track span.dot{color:rgba(232,97,58,0.4);padding:0 0.5rem;}
-    @keyframes tickerRoll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+    /* Gradient edge fade */
+    #ticker-wrap::before,#ticker-wrap::after{
+      content:'';position:absolute;top:0;bottom:0;width:clamp(60px,8vw,120px);z-index:10;pointer-events:none;
+    }
+    #ticker-wrap::before{left:0;background:linear-gradient(to right,#030303 15%,transparent);}
+    #ticker-wrap::after {right:0;background:linear-gradient(to left, #030303 15%,transparent);}
+
+    .t-row{
+      display:flex;overflow:hidden;white-space:nowrap;
+      padding:clamp(0.3rem,0.55vw,0.45rem) 0;
+    }
+    .t-row-b{ border-top:1px solid rgba(232,97,58,0.08); }
+
+    .t-inner{ display:inline-flex;flex-shrink:0;white-space:nowrap; }
+
+    /* Row A scrolls left, Row B scrolls right */
+    .t-row-a .t-inner{ animation:tRollL 36s linear infinite; }
+    .t-row-b .t-inner{ animation:tRollR 48s linear infinite; }
+    @keyframes tRollL{0%{transform:translateX(0);}     100%{transform:translateX(-50%);}}
+    @keyframes tRollR{0%{transform:translateX(-50%);}  100%{transform:translateX(0);}}
+
+    /* Row A — big Bebas Neue service names */
+    .t-item-a{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(0.9rem,1.5vw,1.1rem);
+      letter-spacing:0.1em;
+      color:rgba(244,239,232,0.72);
+      padding:0 clamp(0.7rem,1.2vw,1.1rem);flex-shrink:0;
+    }
+    .t-sep-a{
+      color:rgba(232,97,58,0.65);font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(0.65rem,1.1vw,0.85rem);
+      padding:0 0.1rem;flex-shrink:0;align-self:center;
+    }
+
+    /* Row B — small Inter brand words scrolling opposite */
+    .t-item-b{
+      font-family:'Inter',sans-serif;font-weight:300;
+      font-size:clamp(0.4rem,0.62vw,0.5rem);
+      letter-spacing:0.45em;text-transform:uppercase;
+      color:rgba(232,97,58,0.5);
+      padding:0 clamp(0.9rem,1.8vw,1.6rem);flex-shrink:0;
+    }
+    .t-sep-b{
+      color:rgba(244,239,232,0.14);font-size:0.45rem;
+      padding:0 0.2rem;flex-shrink:0;align-self:center;
+    }
 
     /* ── Misc ─────────────────────────────────────────────────────────────── */
     @keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
@@ -640,16 +690,22 @@
         </div>
       </div>
 
-      <div id="cta" style="opacity:0;transform:translateY(18px);max-width:330px;">
-        <p style="font-size:0.5rem;letter-spacing:0.42em;text-transform:uppercase;color:rgba(244,239,232,0.45);margin-bottom:0.85rem;">
-          Be first to know
-        </p>
-        <form id="frm" onsubmit="submitForm(event)" novalidate style="display:flex;flex-direction:column;gap:0.9rem;">
-          <input type="email" id="eml" class="email-input" placeholder="your@email.com" required autocomplete="email" />
-          <div style="display:flex;align-items:center;gap:1.2rem;">
-            <button type="submit" id="btn">Notify Me</button>
-            <span id="ok" style="display:none;font-size:0.58rem;letter-spacing:0.18em;color:rgba(232,97,58,0.7);">You're on the list ✦</span>
-          </div>
+      <div id="cta" style="opacity:0;transform:translateY(18px);">
+        <form id="frm" onsubmit="submitForm(event)" novalidate
+              style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <!-- Inline label -->
+          <span style="font-size:0.48rem;letter-spacing:0.42em;text-transform:uppercase;
+                       color:rgba(244,239,232,0.45);white-space:nowrap;flex-shrink:0;">
+            Be first to know —
+          </span>
+          <!-- Email input -->
+          <input type="email" id="eml" class="email-input"
+                 placeholder="your@email.com" required autocomplete="email"
+                 style="flex:1;min-width:140px;max-width:200px;" />
+          <!-- CTA button -->
+          <button type="submit" id="btn">Notify Me</button>
+          <span id="ok" style="display:none;font-size:0.58rem;letter-spacing:0.18em;
+                               color:rgba(232,97,58,0.7);">You're on the list ✦</span>
         </form>
       </div>
 
@@ -728,8 +784,10 @@
   </main>
 
   <!-- TICKER -->
+  <!-- Two-row editorial ticker band -->
   <div id="ticker-wrap" aria-hidden="true">
-    <div id="ticker-track"></div>
+    <div class="t-row t-row-a"><div class="t-inner" id="t-a"></div></div>
+    <div class="t-row t-row-b"><div class="t-inner" id="t-b"></div></div>
   </div>
 
   <!-- FOOTER -->
@@ -764,13 +822,27 @@
 
 // ── Ticker ──────────────────────────────────────────────────────────────
 function buildTicker() {
-  const services = ['Cinematography','Video Editing','Color Grading','Motion Graphics',
-    'Corporate Films','Music Videos','Social Content','Advertisements','VFX','Sound Design',
-    'Creative Direction','Visual Storytelling'];
-  const track = document.getElementById('ticker-track');
-  if (!track) return;
-  const s = services.map(x => `<span>${x}</span><span class="dot">·</span>`).join('');
-  track.innerHTML = s + s;
+  // Row A — services, large, scrolls left
+  const rowA = ['Cinematography','Video Editing','Color Grading','Motion Graphics',
+    'Corporate Films','Music Videos','VFX','Sound Design','Creative Direction',
+    'Visual Storytelling','Social Content','Advertisements','Pre-Production','Post-Production'];
+
+  // Row B — brand / identity words, small, scrolls right
+  const rowB = ['Adopt · Innovate · Create','Bengaluru, India','Est. 2024',
+    'Aftershot Productions','Cinematic Excellence','Visual Storytelling',
+    'Premium Production','Frame By Frame','Built For Brands'];
+
+  function buildRow(id, items, itemClass, sepClass, sepChar) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const chunk = items.map(s =>
+      `<span class="${itemClass}">${s}</span><span class="${sepClass}">${sepChar}</span>`
+    ).join('');
+    el.innerHTML = chunk + chunk; // duplicate for seamless loop
+  }
+
+  buildRow('t-a', rowA, 't-item-a', 't-sep-a', '✦');
+  buildRow('t-b', rowB, 't-item-b', 't-sep-b',  '·');
 }
 
 // ── Timecode counter ────────────────────────────────────────────────────
