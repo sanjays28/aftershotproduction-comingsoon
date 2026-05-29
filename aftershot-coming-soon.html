@@ -4,6 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aftershot Productions — Coming Soon</title>
+
+  <!-- Favicon — dark background added dynamically via canvas (logo is white-on-transparent) -->
+  <link rel="icon" id="favicon" type="image/png" href="ASP final logo-02.png" />
+  <link rel="apple-touch-icon" id="apple-icon" href="ASP final logo-02.png" />
+
+  <!-- SEO -->
+  <meta name="description" content="Visual stories, built for impact. Where brands come alive on screen. Launching soon — Aftershot Productions, Bengaluru." />
+  <meta name="theme-color" content="#030303" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Aftershot Productions — Coming Soon" />
+  <meta property="og:description" content="Visual stories, built for impact. Where brands come alive on screen." />
+  <meta property="og:image"       content="ASP final logo-02.png" />
+  <meta property="og:site_name"   content="Aftershot Productions" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Aftershot Productions — Coming Soon" />
+  <meta name="twitter:description" content="Visual stories, built for impact. Where brands come alive on screen." />
+  <meta name="twitter:image"       content="ASP final logo-02.png" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <!-- Spline 3D web component (no React needed) -->
@@ -27,6 +49,23 @@
       overflow:hidden; height:100vh; width:100vw;
     }
     @media(max-width:767px){ body{overflow-y:auto;height:auto;} html{cursor:auto;} }
+
+    /* ── Short viewport (MacBook Air 13/14, 768–820px tall) ─────────────── */
+    @media(max-height:820px) and (min-width:901px){
+      body{overflow-y:auto!important;height:auto!important;}
+      #page{height:auto!important;min-height:100vh;}
+      /* Scale headlines down proportionally */
+      #h1,#h2,#h3{font-size:clamp(2.4rem,5.2vw,5.2rem)!important;}
+      /* Tighten section spacing */
+      #rule{margin:clamp(0.4rem,0.8vw,0.8rem) 0!important;}
+      .clip[style*="margin-bottom"]{margin-bottom:clamp(0.6rem,1vw,1rem)!important;}
+      #cd-wrap{margin-bottom:clamp(0.6rem,1vw,1rem)!important;}
+      /* Shrink countdown digits */
+      .cd-num{font-size:clamp(1.2rem,2.2vw,1.8rem)!important;}
+    }
+    @media(max-height:700px) and (min-width:901px){
+      #h1,#h2,#h3{font-size:clamp(2rem,4.5vw,4.2rem)!important;}
+    }
 
     /* ── Reactive bg ──────────────────────────────────────────────────────── */
     #grad-bg {
@@ -127,6 +166,7 @@
       padding:clamp(1.25rem,2.5vw,2rem) clamp(1.5rem,4vw,3.5rem);
     }
     @media(max-width:767px){#page{height:auto;min-height:100vh;overflow-y:auto;}}
+    @media(max-height:820px) and (min-width:901px){#page{height:auto;min-height:100vh;}}
 
     /* ── Email / Button ───────────────────────────────────────────────────── */
     .email-input{
@@ -522,7 +562,6 @@
       .cd-lbl{font-size:0.34rem!important;}
       /* Form: stack vertically */
       #frm{flex-direction:column!important;align-items:flex-start!important;gap:0.7rem!important;}
-      #frm>span{display:none!important;} /* hide inline label, too cramped */
       #eml{min-width:100%!important;max-width:100%!important;}
       #btn{width:100%!important;text-align:center!important;}
       /* Ticker: slightly smaller */
@@ -533,6 +572,31 @@
     @media(max-width:400px){
       #h1,#h2,#h3{font-size:clamp(2.2rem,15vw,3.6rem)!important;}
     }
+    /* ── Film strip left border ──────────────────────────────────────────── */
+    #filmstrip-l{
+      position:fixed;left:0;top:0;bottom:0;width:14px;
+      z-index:8000;pointer-events:none;
+      background-color:#030303;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='22'%3E%3Crect x='2' y='3' width='10' height='14' rx='2' fill='rgba(244,239,232,0.07)'/%3E%3C/svg%3E");
+      background-size:14px 22px;
+      background-repeat:repeat-y;
+      border-right:1px solid rgba(232,97,58,0.14);
+      animation:filmRoll 1.4s linear infinite;
+      opacity:0;transition:opacity 1s ease 0.5s;
+    }
+    #filmstrip-l.fs-on{opacity:1;}
+    @keyframes filmRoll{from{background-position:0 0;}to{background-position:0 22px;}}
+    @media(max-width:767px){#filmstrip-l{display:none;}}
+
+    /* ── FOMO counter ────────────────────────────────────────────────────── */
+    #fomo{
+      margin-top:0.65rem;
+      font-size:0.42rem;letter-spacing:0.38em;text-transform:uppercase;
+      color:rgba(244,239,232,0.22);font-family:'Inter',sans-serif;font-weight:300;
+      opacity:0;
+    }
+    #fomo-n{ color:rgba(232,97,58,0.65); font-weight:400; }
+
     @media(prefers-reduced-motion:reduce){
       *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}
     }
@@ -642,6 +706,9 @@
   </style>
 </head>
 <body>
+
+<!-- Film strip left border -->
+<div id="filmstrip-l" aria-hidden="true"></div>
 
 <!-- ══ PRELOADER ══════════════════════════════════════════════════════════ -->
 <div id="preloader" aria-label="Loading Aftershot Productions">
@@ -775,22 +842,22 @@
       </div>
 
       <div id="cta" style="opacity:0;transform:translateY(18px);">
+        <!-- Label sits above the form so it never competes for width -->
+        <p style="font-size:0.48rem;letter-spacing:0.42em;text-transform:uppercase;
+                  color:rgba(244,239,232,0.45);margin-bottom:0.7rem;">
+          Be first to know —
+        </p>
         <form id="frm" onsubmit="submitForm(event)" novalidate
-              style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-          <!-- Inline label -->
-          <span style="font-size:0.48rem;letter-spacing:0.42em;text-transform:uppercase;
-                       color:rgba(244,239,232,0.45);white-space:nowrap;flex-shrink:0;">
-            Be first to know —
-          </span>
-          <!-- Email input -->
+              style="display:flex;align-items:center;gap:0.75rem;">
           <input type="email" id="eml" class="email-input"
                  placeholder="your@email.com" required autocomplete="email"
-                 style="flex:1;min-width:140px;max-width:200px;" />
-          <!-- CTA button -->
-          <button type="submit" id="btn">Notify Me</button>
+                 style="flex:1;min-width:0;" />
+          <button type="submit" id="btn" style="flex-shrink:0;">Notify Me</button>
           <span id="ok" style="display:none;font-size:0.58rem;letter-spacing:0.18em;
                                color:rgba(232,97,58,0.7);">You're on the list ✦</span>
         </form>
+        <!-- FOMO counter -->
+        <p id="fomo"><span id="fomo-n">347</span>+ already on the list</p>
       </div>
 
     </div>
@@ -1113,6 +1180,25 @@ function startMainTimeline() {
   tl.to('#cta',        { opacity:1, y:0, duration:0.95, ease:'power3.out' }, 1.65);
   tl.to('#ticker-wrap',{ opacity:1, duration:0.8, ease:'power2.out' }, 2.1);
   tl.to('#ftr',        { opacity:1, duration:0.8, ease:'power2.out' }, 2.2);
+  tl.to('#fomo',       { opacity:1, duration:0.8, ease:'power2.out' }, 2.3);
+
+  // Film strip reveal
+  document.getElementById('filmstrip-l').classList.add('fs-on');
+
+  // FOMO count-up: 0 → 347 over 2.4s with ease-out
+  setTimeout(() => {
+    const el = document.getElementById('fomo-n');
+    if (!el) return;
+    const target = 347, dur = 2400;
+    let t0 = null;
+    (function tick(ts) {
+      if (!t0) t0 = ts;
+      const p = Math.min((ts - t0) / dur, 1);
+      el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    })(performance.now());
+  }, 2000);
 }
 
 // ── Preloader ─────────────────────────────────────────────────────────────
@@ -1136,6 +1222,79 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       });
 });
+
+
+// ── Tab title animation (fires when user switches away) ──────────────────
+(function tabTitle() {
+  const original = document.title;
+  const alt      = '— COMING SOON —';
+  let iv, state = false;
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      iv = setInterval(() => {
+        document.title = (state = !state) ? '◉ AFTERSHOT' : alt;
+      }, 1600);
+    } else {
+      clearInterval(iv);
+      document.title = original;
+    }
+  });
+})();
+
+
+// ── Favicon: logo on dark background via canvas ───────────────────────────
+(function buildFavicon() {
+  const SIZE = 64, R = 14;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = SIZE;
+  const ctx = canvas.getContext('2d');
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
+  function apply(dataUrl) {
+    document.getElementById('favicon').href    = dataUrl;
+    document.getElementById('apple-icon').href = dataUrl;
+  }
+
+  // Draw dark pill background + logo
+  function draw(img) {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+
+    // Dark rounded background
+    roundRect(0, 0, SIZE, SIZE, R);
+    ctx.fillStyle = '#030303';
+    ctx.fill();
+
+    // Faint orange border
+    ctx.strokeStyle = 'rgba(232,97,58,0.55)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Logo centred with padding
+    const pad = 8;
+    if (img) ctx.drawImage(img, pad, pad, SIZE - pad * 2, SIZE - pad * 2);
+
+    apply(canvas.toDataURL('image/png'));
+  }
+
+  // Try to load the real logo
+  const img = new Image();
+  img.onload  = () => draw(img);
+  img.onerror = () => draw(null);   // fallback: just dark background
+  img.src = 'ASP final logo-02.png';
+})();
 
 
 // ── Hide Spline "Built with Spline" watermark via shadow DOM ─────────────
