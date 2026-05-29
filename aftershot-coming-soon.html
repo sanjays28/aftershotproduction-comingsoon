@@ -427,6 +427,66 @@
       95% {opacity:1;}100%{top:100%;opacity:0;}
     }
 
+    /* ── Scanline reveal — “COMING SOON” flanks the robot ────────────────── */
+    #vfx-scan-reveal{
+      position:absolute;inset:0;z-index:7;pointer-events:none;
+      display:grid;
+      grid-template-columns:minmax(0,0.68fr) minmax(0,2.4fr) minmax(0,0.68fr);
+      align-items:center;
+      padding:0 clamp(0.5rem,2.2vw,1.1rem);
+      column-gap:clamp(0.6rem,2.5vw,1.4rem);
+    }
+    .scan-reveal-text{
+      display:contents;
+    }
+    .scan-word{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:0.1em;
+      white-space:nowrap;
+    }
+    .scan-word-left{
+      grid-column:1;
+      justify-self:start;
+      padding-right:clamp(0.35rem,1.8vw,0.85rem);
+    }
+    .scan-word-right{
+      grid-column:3;
+      justify-self:end;
+      padding-left:clamp(0.35rem,1.8vw,0.85rem);
+    }
+    .scan-char{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(0.95rem,2vw,1.55rem);
+      line-height:1;
+      letter-spacing:0.1em;
+      opacity:0;
+      color:rgba(244,239,232,0.92);
+      text-shadow:0 0 14px rgba(232,97,58,0.45);
+      will-change:opacity,transform;
+    }
+    .scan-char.glitch{animation:scanCharGlitch 0.14s steps(2);}
+    @keyframes scanCharGlitch{
+      0%  {transform:translate(0);filter:none;}
+      50% {transform:translate(-2px,1px);filter:brightness(1.4);color:var(--accent);}
+      100%{transform:translate(0);filter:none;}
+    }
+    @media(max-width:900px){
+      #vfx-scan-reveal{
+        grid-template-columns:minmax(0,0.62fr) minmax(0,2.5fr) minmax(0,0.62fr);
+        column-gap:clamp(0.4rem,2vw,0.9rem);
+        padding:0 clamp(0.35rem,1.5vw,0.65rem);
+      }
+      .scan-char{font-size:clamp(0.72rem,3vw,1rem);}
+      .scan-word{gap:0.07em;}
+      .scan-word-left{padding-right:clamp(0.25rem,1.2vw,0.55rem);}
+      .scan-word-right{padding-left:clamp(0.25rem,1.2vw,0.55rem);}
+    }
+    @media(prefers-reduced-motion:reduce){
+      .scan-char{opacity:0.32!important;animation:none!important;}
+    }
+
     /* ── HUD overlay ──────────────────────────────────────────────────────── */
     #vfx-hud{
       position:absolute;inset:0;
@@ -876,6 +936,18 @@
         <!-- THE VFX PANEL -->
         <div id="vfx-panel">
 
+          <!-- Scanline reveal — COMING left / SOON right of robot -->
+          <div id="vfx-scan-reveal" aria-hidden="true">
+            <div class="scan-reveal-text">
+              <div class="scan-word scan-word-left">
+                <span class="scan-char">C</span><span class="scan-char">O</span><span class="scan-char">M</span><span class="scan-char">I</span><span class="scan-char">N</span><span class="scan-char">G</span>
+              </div>
+              <div class="scan-word scan-word-right">
+                <span class="scan-char">S</span><span class="scan-char">O</span><span class="scan-char">O</span><span class="scan-char">N</span>
+              </div>
+            </div>
+          </div>
+
           <!-- ── Spline 3D scene (base layer) ── -->
           <spline-viewer
             url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
@@ -1300,6 +1372,79 @@ window.addEventListener('DOMContentLoaded', () => {
   img.onload  = () => draw(img);
   img.onerror = () => draw(null);   // fallback: just dark background
   img.src = 'ASP final logo-02.png';
+})();
+
+
+// ── Scanline reveal — sync “COMING SOON” to #vfx-scan ───────────────────
+(function initScanReveal() {
+  const panel  = document.getElementById('vfx-panel');
+  const scanEl = document.getElementById('vfx-scan');
+  const chars  = [...document.querySelectorAll('#vfx-scan-reveal .scan-char')];
+  if (!panel || !scanEl || !chars.length) return;
+
+  const SCAN_DUR   = 5000;
+  const REVEAL_BAND = 32;
+  const FADE_RATE  = 0.014;
+  const states     = chars.map(() => ({ opacity: 0, flashed: false }));
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  function scanState() {
+    const anims = scanEl.getAnimations();
+    if (!anims.length) return { y: -999, strength: 0, t: 0 };
+    const t = (anims[0].currentTime ?? 0) % SCAN_DUR;
+    let progress, strength;
+    if (t < 250) {
+      progress = 0;
+      strength = t / 250;
+    } else if (t > 4750) {
+      progress = 1;
+      strength = (SCAN_DUR - t) / 250;
+    } else {
+      progress = (t - 250) / 4500;
+      strength = 1;
+    }
+    return { y: progress * panel.offsetHeight, strength, t };
+  }
+
+  function tick() {
+    const panelRect = panel.getBoundingClientRect();
+    const { y: scanY, strength, t } = scanState();
+
+    if (t < 40) {
+      states.forEach((s, i) => { s.opacity = 0; s.flashed = false; });
+      chars.forEach(c => c.classList.remove('glitch'));
+    }
+
+    chars.forEach((char, i) => {
+      const rect   = char.getBoundingClientRect();
+      const charY  = rect.top + rect.height * 0.5 - panelRect.top;
+      const dist   = Math.abs(scanY - charY);
+
+      if (dist < REVEAL_BAND && strength > 0.25) {
+        const hit = 1 - dist / REVEAL_BAND;
+        states[i].opacity = Math.max(states[i].opacity, hit * strength * 0.92);
+        if (!states[i].flashed && hit > 0.65) {
+          states[i].flashed = true;
+          char.classList.add('glitch');
+          setTimeout(() => char.classList.remove('glitch'), 140);
+        }
+      } else {
+        states[i].opacity = Math.max(0, states[i].opacity - FADE_RATE);
+        if (states[i].opacity < 0.04) states[i].flashed = false;
+      }
+
+      const o = states[i].opacity;
+      char.style.opacity = o;
+      char.style.color = o > 0.45
+        ? `rgba(244,239,232,${Math.min(1, o + 0.08)})`
+        : `rgba(232,97,58,${o * 0.55})`;
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
 })();
 
 
