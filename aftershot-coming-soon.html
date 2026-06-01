@@ -198,7 +198,7 @@
     }
     #waitlist-return-email{
       font-size:0.72rem;letter-spacing:0.08em;
-      color:rgba(244,239,232,0.55);
+      color:rgba(244,239,232,0.72);
       font-family:'Inter',sans-serif;font-weight:300;
       word-break:break-all;
     }
@@ -627,9 +627,11 @@
         grid-template-rows:auto auto!important;
         gap:1.4rem!important;align-items:start!important;
       }
-      #right-col{order:-1;transform:translateX(0)!important;opacity:1!important;}
+      /* Text (left-col) stays first; robot panel goes second and is centered */
+      #right-col{order:1;transform:translateX(0)!important;opacity:1!important;}
+      #left-col{order:0;}
       #vfx-panel{height:clamp(200px,48vw,320px)!important;}
-      #h1,#h2,#h3{font-size:clamp(3rem,10vw,5rem)!important;}
+      #h1,#h2,#h3{font-size:clamp(2.6rem,9.5vw,4.5rem)!important;}
       #sound-btn{display:none;}
     }
     @media(max-width:640px){
@@ -638,7 +640,8 @@
                clamp(0.6rem,2vw,1rem)!important;
       }
       #hdr img{height:30px!important;}
-      #h1,#h2,#h3{font-size:clamp(2.6rem,13vw,4.2rem)!important;}
+      /* Reduced so "PRODUCTIONS" fits on one line without clipping */
+      #h1,#h2,#h3{font-size:clamp(2rem,9.5vw,3.6rem)!important;}
       /* Countdown fits on one line */
       .cd-num{font-size:clamp(1.15rem,6vw,1.6rem)!important;}
       .cd-sep{font-size:clamp(0.9rem,4.5vw,1.3rem)!important;padding:0 0.1rem!important;}
@@ -653,7 +656,7 @@
       #ftr{flex-direction:column!important;gap:0.3rem!important;}
     }
     @media(max-width:400px){
-      #h1,#h2,#h3{font-size:clamp(2.2rem,15vw,3.6rem)!important;}
+      #h1,#h2,#h3{font-size:clamp(1.8rem,10vw,2.8rem)!important;}
     }
     /* ── Film strip left border ──────────────────────────────────────────── */
     #filmstrip-l{
@@ -675,10 +678,10 @@
     #fomo{
       margin-top:0.65rem;
       font-size:0.42rem;letter-spacing:0.38em;text-transform:uppercase;
-      color:rgba(244,239,232,0.22);font-family:'Inter',sans-serif;font-weight:300;
+      color:rgba(244,239,232,0.48);font-family:'Inter',sans-serif;font-weight:300;
       opacity:0;
     }
-    #fomo-n{ color:rgba(232,97,58,0.65); font-weight:400; }
+    #fomo-n{ color:rgba(232,97,58,0.82); font-weight:400; }
 
     @media(prefers-reduced-motion:reduce){
       *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}
@@ -792,7 +795,7 @@
     }
     .cd-lbl{
       font-size:0.4rem;letter-spacing:0.45em;
-      text-transform:uppercase;color:rgba(244,239,232,0.45);
+      text-transform:uppercase;color:rgba(244,239,232,0.58);
       font-family:'Inter',sans-serif;font-weight:300;
     }
     .cd-sep{
@@ -804,10 +807,14 @@
       margin-top:0.1rem;
     }
     #cd-launch-label{
-      font-size:0.46rem;letter-spacing:0.42em;
-      text-transform:uppercase;color:rgba(232,97,58,0.6);
-      margin-bottom:0.6rem;
-      font-family:'Inter',sans-serif;font-weight:400;
+      font-size:clamp(0.54rem,0.82vw,0.68rem);
+      letter-spacing:0.32em;
+      text-transform:uppercase;
+      color:var(--accent);
+      margin-bottom:0.65rem;
+      font-family:'Share Tech Mono','Courier New',monospace;
+      font-weight:400;
+      text-shadow:0 0 12px rgba(232,97,58,0.35);
     }
   </style>
 </head>
@@ -931,9 +938,9 @@
         <p id="sub"
            style="margin:0;font-size:clamp(0.7rem,1.05vw,0.82rem);
                   font-weight:200;line-height:2;letter-spacing:0.06em;
-                  color:rgba(244,239,232,0.52);transform:translateY(125%);max-width:295px;">
+                  color:rgba(244,239,232,0.68);transform:translateY(125%);max-width:295px;">
           Visual stories, built for impact.<br>
-          <span class="editorial" style="color:rgba(244,239,232,0.35);font-size:1.08em;">Where brands come alive on screen.</span>
+          <span class="editorial" style="color:rgba(244,239,232,0.52);font-size:1.08em;">Where brands come alive on screen.</span>
         </p>
       </div>
 
@@ -954,7 +961,7 @@
       <div id="cta" style="opacity:0;transform:translateY(18px);">
         <!-- Label sits above the form so it never competes for width -->
         <p id="cta-label" style="font-size:0.48rem;letter-spacing:0.42em;text-transform:uppercase;
-                  color:rgba(244,239,232,0.45);margin-bottom:0.7rem;">
+                  color:rgba(244,239,232,0.58);margin-bottom:0.7rem;">
           Be first to know —
         </p>
         <div id="waitlist-return" aria-live="polite">
