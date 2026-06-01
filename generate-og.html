@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>OG Image Generator — Aftershot Productions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@200;300;400&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:24px;font-family:'Inter',sans-serif;}
+    canvas{border:1px solid rgba(232,97,58,0.3);display:block;}
+    .controls{display:flex;gap:12px;align-items:center;}
+    button{
+      background:transparent;border:1px solid rgba(232,97,58,0.6);
+      color:#F4EFE8;font-family:'Inter',sans-serif;font-size:0.7rem;
+      letter-spacing:0.3em;text-transform:uppercase;padding:10px 24px;
+      cursor:pointer;transition:background 0.3s;
+    }
+    button:hover{background:rgba(232,97,58,0.15);}
+    p{color:rgba(244,239,232,0.4);font-size:0.65rem;letter-spacing:0.2em;}
+  </style>
+</head>
+<body>
+
+<canvas id="og" width="1200" height="630"></canvas>
+<div class="controls">
+  <button onclick="download()">Download og-image.jpg</button>
+</div>
+<p>Place og-image.jpg in your website root folder after downloading</p>
+
+<script>
+const W = 1200, H = 630;
+const INK    = '#030303';
+const PAPER  = '#F4EFE8';
+const ACCENT = '#E8613A';
+
+const canvas = document.getElementById('og');
+const ctx    = canvas.getContext('2d');
+
+// Wait for fonts
+document.fonts.ready.then(() => draw());
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // ── Background ──────────────────────────────────────────────────────────
+  ctx.fillStyle = INK;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Radial orange glow — top-left ───────────────────────────────────────
+  const g1 = ctx.createRadialGradient(180, 140, 0, 180, 140, 520);
+  g1.addColorStop(0, 'rgba(232,97,58,0.13)');
+  g1.addColorStop(1, 'transparent');
+  ctx.fillStyle = g1;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Radial purple glow — bottom-right ───────────────────────────────────
+  const g2 = ctx.createRadialGradient(W - 100, H + 60, 0, W - 100, H + 60, 480);
+  g2.addColorStop(0, 'rgba(80,40,160,0.1)');
+  g2.addColorStop(1, 'transparent');
+  ctx.fillStyle = g2;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Film grain (noise approximation) ────────────────────────────────────
+  ctx.save();
+  ctx.globalAlpha = 0.032;
+  for (let i = 0; i < 18000; i++) {
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    const b = Math.random() * 255;
+    ctx.fillStyle = `rgb(${b},${b},${b})`;
+    ctx.fillRect(x, y, 1, 1);
+  }
+  ctx.restore();
+
+  // ── Film perforation strips — left & right ───────────────────────────────
+  drawPerfs(0, 18);
+  drawPerfs(W - 18, 18);
+
+  // ── Horizontal rule lines ────────────────────────────────────────────────
+  ctx.save();
+  ctx.strokeStyle = 'rgba(232,97,58,0.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(56, 58); ctx.lineTo(W - 56, 58); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(56, H - 58); ctx.lineTo(W - 56, H - 58); ctx.stroke();
+  ctx.restore();
+
+  // ── Corner brackets ───────────────────────────────────────────────────────
+  drawCorner(56, 58, 'tl');
+  drawCorner(W - 56, 58, 'tr');
+  drawCorner(56, H - 58, 'bl');
+  drawCorner(W - 56, H - 58, 'br');
+
+  // ── Top HUD row ───────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.font = '400 11px "Share Tech Mono"';
+  ctx.letterSpacing = '3px';
+  ctx.fillStyle = 'rgba(232,97,58,0.75)';
+  ctx.fillText('◈  SHOWREEL', 80, 42);
+
+  // REC dot
+  ctx.beginPath();
+  ctx.arc(W / 2, 37, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#E03030';
+  ctx.fill();
+  ctx.font = '400 11px "Share Tech Mono"';
+  ctx.fillStyle = 'rgba(224,48,48,0.8)';
+  ctx.fillText(' REC', W / 2 + 8, 42);
+
+  ctx.fillStyle = 'rgba(232,97,58,0.75)';
+  ctx.textAlign = 'right';
+  ctx.fillText('2026', W - 80, 42);
+  ctx.restore();
+
+  // ── Bottom HUD row ────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.font = '300 11px "Share Tech Mono"';
+  ctx.letterSpacing = '3px';
+  ctx.fillStyle = 'rgba(244,239,232,0.35)';
+  ctx.textAlign = 'left';
+  ctx.fillText('AFTERSHOT PRODUCTIONS', 80, H - 38);
+  ctx.textAlign = 'center';
+  ctx.fillText('00:00:00:00', W / 2, H - 38);
+  ctx.textAlign = 'right';
+  ctx.fillText('BLR · IND', W - 80, H - 38);
+  ctx.restore();
+
+  // ── Vertical divider line left-of-text ───────────────────────────────────
+  ctx.save();
+  ctx.strokeStyle = 'rgba(232,97,58,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(350, 100); ctx.lineTo(350, H - 100); ctx.stroke();
+  ctx.restore();
+
+  // ── Logo area ─────────────────────────────────────────────────────────────
+  const logo = new Image();
+  logo.onload = () => {
+    // Draw logo in left panel, centered
+    const logoW = 160, logoH = 160;
+    const logoX = (350 - logoW) / 2;
+    const logoY = (H - logoH) / 2 - 20;
+    ctx.drawImage(logo, logoX, logoY, logoW, logoH);
+
+    // Faint orange ring around logo
+    ctx.save();
+    ctx.strokeStyle = 'rgba(232,97,58,0.2)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    ctx.arc(350 / 2, H / 2 - 20, 100, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
+    drawText();
+  };
+  logo.onerror = () => drawText(); // no logo, still draw text
+  logo.src = 'ASP final logo-02.png';
+}
+
+function drawText() {
+  const TL = 380; // text left margin
+
+  // ── Label — "A NEW CREATIVE FORCE" ──────────────────────────────────────
+  ctx.save();
+  ctx.font = '400 13px "Inter"';
+  ctx.letterSpacing = '5px';
+  ctx.fillStyle = ACCENT;
+  ctx.textAlign = 'left';
+  // Small dash before label
+  ctx.fillStyle = ACCENT;
+  ctx.fillRect(TL, 148, 22, 1);
+  ctx.font = '400 11px "Inter"';
+  ctx.fillStyle = ACCENT;
+  ctx.fillText('A NEW CREATIVE FORCE', TL + 32, 152);
+  ctx.restore();
+
+  // ── AFTER ────────────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.font = '400 156px "Bebas Neue"';
+  ctx.letterSpacing = '2px';
+  ctx.fillStyle = PAPER;
+  ctx.textAlign = 'left';
+  ctx.fillText('AFTER', TL, 300);
+  ctx.restore();
+
+  // ── SHOT — outlined ───────────────────────────────────────────────────────
+  ctx.save();
+  ctx.font = '400 156px "Bebas Neue"';
+  ctx.letterSpacing = '2px';
+  ctx.strokeStyle = 'rgba(244,239,232,0.22)';
+  ctx.lineWidth = 2;
+  ctx.textAlign = 'left';
+  ctx.strokeText('SHOT', TL, 420);
+  ctx.restore();
+
+  // ── PRODUCTIONS — orange ──────────────────────────────────────────────────
+  ctx.save();
+  ctx.font = '400 104px "Bebas Neue"';
+  ctx.letterSpacing = '2px';
+  ctx.fillStyle = ACCENT;
+  ctx.textAlign = 'left';
+  ctx.fillText('PRODUCTIONS_', TL, 520);
+  ctx.restore();
+
+  // ── Divider rule ──────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.strokeStyle = 'rgba(244,239,232,0.08)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(TL, 545); ctx.lineTo(TL + 400, 545); ctx.stroke();
+  ctx.restore();
+
+  // ── Tagline ───────────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.font = '200 17px "Inter"';
+  ctx.letterSpacing = '2px';
+  ctx.fillStyle = 'rgba(244,239,232,0.55)';
+  ctx.textAlign = 'left';
+  ctx.fillText('Visual stories, built for impact.', TL, 575);
+  ctx.restore();
+
+  // ── URL ───────────────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.font = '300 12px "Share Tech Mono"';
+  ctx.letterSpacing = '3px';
+  ctx.fillStyle = 'rgba(232,97,58,0.55)';
+  ctx.textAlign = 'left';
+  ctx.fillText('aftershotproduction.com', TL, 603);
+  ctx.restore();
+
+  // ── "COMING SOON" badge ───────────────────────────────────────────────────
+  ctx.save();
+  ctx.strokeStyle = 'rgba(232,97,58,0.45)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(TL, 560, 230, 1); // thin line under tagline already done
+
+  // Badge top-right
+  const bx = W - 80, by = 120;
+  ctx.strokeStyle = 'rgba(232,97,58,0.35)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(bx - 130, by - 22, 130, 30);
+  ctx.font = '400 11px "Share Tech Mono"';
+  ctx.letterSpacing = '4px';
+  ctx.fillStyle = 'rgba(232,97,58,0.7)';
+  ctx.textAlign = 'right';
+  ctx.fillText('+ IN PRODUCTION', bx - 8, by - 3);
+  ctx.restore();
+
+  // ── Scan line effect ─────────────────────────────────────────────────────
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  for (let y = 0; y < H; y += 3) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, y, W, 1);
+  }
+  ctx.restore();
+
+  // ── Bottom gradient vignette ─────────────────────────────────────────────
+  const vBot = ctx.createLinearGradient(0, H - 80, 0, H);
+  vBot.addColorStop(0, 'transparent');
+  vBot.addColorStop(1, 'rgba(3,3,3,0.5)');
+  ctx.fillStyle = vBot;
+  ctx.fillRect(0, H - 80, W, 80);
+}
+
+function drawPerfs(x, w) {
+  ctx.save();
+  ctx.fillStyle = '#020202';
+  ctx.fillRect(x, 0, w, H);
+  ctx.strokeStyle = 'rgba(244,239,232,0.06)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, 0, w, H);
+  // Perf holes
+  for (let y = 24; y < H; y += 28) {
+    ctx.fillStyle = '#000';
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 0.5;
+    roundRect(ctx, x + 4, y, 10, 14, 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawCorner(x, y, pos) {
+  const L = 24;
+  ctx.save();
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  if (pos === 'tl') { ctx.moveTo(x, y + L); ctx.lineTo(x, y); ctx.lineTo(x + L, y); }
+  if (pos === 'tr') { ctx.moveTo(x - L, y); ctx.lineTo(x, y); ctx.lineTo(x, y + L); }
+  if (pos === 'bl') { ctx.moveTo(x, y - L); ctx.lineTo(x, y); ctx.lineTo(x + L, y); }
+  if (pos === 'br') { ctx.moveTo(x - L, y); ctx.lineTo(x, y); ctx.lineTo(x, y - L); }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function download() {
+  const link = document.createElement('a');
+  link.download = 'og-image.jpg';
+  link.href = canvas.toDataURL('image/jpeg', 0.92);
+  link.click();
+}
+</script>
+</body>
+</html>

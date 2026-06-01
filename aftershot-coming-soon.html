@@ -15,16 +15,20 @@
 
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://aftershotproduction.com/" />
   <meta property="og:title"       content="Aftershot Productions — Coming Soon" />
   <meta property="og:description" content="Visual stories, built for impact. Where brands come alive on screen." />
-  <meta property="og:image"       content="ASP final logo-02.png" />
+  <meta property="og:image"       content="https://aftershotproduction.com/og-image.jpg" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"   content="Aftershot Productions — Coming Soon" />
   <meta property="og:site_name"   content="Aftershot Productions" />
 
   <!-- Twitter / X -->
-  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:card"        content="summary_large_image" />
   <meta name="twitter:title"       content="Aftershot Productions — Coming Soon" />
   <meta name="twitter:description" content="Visual stories, built for impact. Where brands come alive on screen." />
-  <meta name="twitter:image"       content="ASP final logo-02.png" />
+  <meta name="twitter:image"       content="https://aftershotproduction.com/og-image.jpg" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -1091,7 +1095,12 @@
          onmouseenter="this.style.color='rgba(232,97,58,0.8)'"
          onmouseleave="this.style.color='rgba(244,239,232,0.45)'">asthecreators@gmail.com</a>
       <span style="color:rgba(232,97,58,0.3);">·</span>
-      <span style="font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,239,232,0.35);">9164863808</span>
+      <a href="tel:+918123185625"
+         style="font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;
+                color:rgba(244,239,232,0.45);text-decoration:none;cursor:none;
+                transition:color 0.3s ease;"
+         onmouseenter="this.style.color='rgba(232,97,58,0.8)'"
+         onmouseleave="this.style.color='rgba(244,239,232,0.45)'">+91 81231 85625</a>
     </div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:0.62rem;letter-spacing:0.28em;color:rgba(244,239,232,0.22);">
       ADOPT · INNOVATE · CREATE
@@ -1343,7 +1352,7 @@ function scheduleGlitch() {
 // ── Launch countdown — synced to visitor's system clock ───────────────────
 // Set PUBLISH_DATE to the day you ship; countdown ends LAUNCH_DAYS later at midnight.
 const LAUNCH_DAYS = 30;
-const PUBLISH_DATE = '2026-05-29';
+const PUBLISH_DATE = '2026-06-01';
 const LAUNCH_DATE = (() => {
   const [y, m, d] = PUBLISH_DATE.split('-').map(Number);
   const launch = new Date(y, m - 1, d, 0, 0, 0, 0);
